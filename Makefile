@@ -9,3 +9,9 @@ test.bin: test.o
 test.o: test.S
 	as -32 test.S -o test.o
 	
+.PHONY: clean
+
+clean:
+	@rm -f *.o
+	@rm -f kvmsample test.bin
+

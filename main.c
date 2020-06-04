@@ -10,6 +10,8 @@
 #include <fcntl.h>
 #include <stdlib.h>
 #include <assert.h>
+#include <unistd.h>
+#include <sys/ioctl.h>
 
 #define KVM_DEVICE "/dev/kvm"
 #define RAM_SIZE 512000000
@@ -132,15 +134,17 @@ void load_binary(struct kvm *kvm) {
 
     int ret = 0;
     char *p = (char *)kvm->ram_start;
+    unsigned long total = 0;
 
     while(1) {
         ret = read(fd, p, 4096);
         if (ret <= 0) {
             break;
         }
-        printf("read size: %d", ret);
+        total += ret;
         p += ret;
     }
+    printf("read binary size: %lu \n", total);
 }
 
 struct kvm *kvm_init(void) {
@@ -219,7 +223,7 @@ struct vcpu *kvm_init_vcpu(struct kvm *kvm, int vcpu_id, void *(*fn)(void *)) {
         return NULL;
     }
 
-    printf("%d\n", vcpu->kvm_run_mmap_size);
+    printf("vcpu map size: %d\n", vcpu->kvm_run_mmap_size);
     vcpu->kvm_run = mmap(NULL, vcpu->kvm_run_mmap_size, PROT_READ | PROT_WRITE, MAP_SHARED, vcpu->vcpu_fd, 0);
 
     if (vcpu->kvm_run == MAP_FAILED) {
