@@ -90,6 +90,9 @@ void *kvm_cpu_thread(void *data) {
 		}
 
 		switch (kvm->vcpus->kvm_run->exit_reason) {
+                case KVM_EXIT_HLT:
+                        printf("KVM_EXIT_HLT\n");
+                        goto exit_kvm;
 		case KVM_EXIT_UNKNOWN:
 			printf("KVM_EXIT_UNKNOWN\n");
 			break;
@@ -114,6 +117,15 @@ void *kvm_cpu_thread(void *data) {
 			printf("KVM_EXIT_SHUTDOWN\n");
 			goto exit_kvm;
 			break;
+                case KVM_EXIT_FAIL_ENTRY:
+                        printf("KVM_EXIT_FAIL_ENTRY:\n");
+                        printf("hardware_entry_failure_reason = 0x%llx\n",
+                               (unsigned long long)kvm->vcpus->kvm_run->fail_entry.hardware_entry_failure_reason);
+                        goto exit_kvm;
+                case KVM_EXIT_INTERNAL_ERROR:
+                        printf("KVM_EXIT_INTERNAL_ERROR:\n");
+                        printf("suberror = %u\n", kvm->vcpus->kvm_run->internal.suberror);
+                        goto exit_kvm;
 		default:
 			printf("KVM PANIC\n");
 			goto exit_kvm;
