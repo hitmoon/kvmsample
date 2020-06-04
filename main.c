@@ -169,6 +169,7 @@ struct kvm *kvm_init(void) {
     }
 
     kvm->kvm_version = ioctl(kvm->dev_fd, KVM_GET_API_VERSION, 0);
+    printf("KVM API VERSION: %d\n", kvm->kvm_version);
 
     return kvm;
 }
